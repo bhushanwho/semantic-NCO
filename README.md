@@ -35,13 +35,13 @@ notebooks/ has jupyter notebooks that do most of the preprocessing
 - saved as csv
 
 ### description generation
-- descriptors volume of NCO-2015 data was chunked & vectorized
+- descriptors volume of NCO-2015 data was chunked & vectorized into FAISS
 - used ollama + small lm gemma3:1b to generate descriptions
 - each row now has a description
 
 ### embeddings + vectorstore
 - chunked descriptions
-- stored in vectorstore
+- stored in FAISS vectorstore
 - created embed_data column in csv with vector info (only 500 for this prototype)
 
 ---
