@@ -13,6 +13,10 @@ basically: scrape website -> generate descriptions -> embed -> fastapi backend -
 # demo
 
 
+https://github.com/user-attachments/assets/66a79c0c-c4d4-4e06-8480-501f27efb87e
+
+
+
 # future expansion aside from prototype
 - standardized queries via a query processor
 - support for multilingual queries - translation + query processor
