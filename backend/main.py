@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
 from typing import List
@@ -33,13 +34,25 @@ faiss_store = FAISS.from_texts(texts, embeddings, metadatas=metadatas)
 
 app = FastAPI(title="NCO Semantic Search")
 
+origins = [
+    "http://localhost:3000",  # Next.js dev server
+    "http://127.0.0.1:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/data", response_model=List[Occupation])
 def get_data():
     return df[ALLOWED_FIELDS].to_dict(orient="records")
 
-@app.get("/fallback_search", response_model=List[Occupation])
-def fallback_search(query: str = Query(..., description="Search query")):
+@app.get("/exact_search", response_model=List[Occupation])
+def exact_search(query: str = Query(..., description="Search query")):
     mask = df["occupation_title"].str.contains(query, case=False, na=False)
     return df.loc[mask, ALLOWED_FIELDS].to_dict(orient="records")
 
