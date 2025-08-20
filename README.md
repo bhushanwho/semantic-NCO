@@ -5,15 +5,18 @@ basically: scrape website -> generate descriptions -> embed -> fastapi backend -
 
 ---
 # TODOS for ETL
-[] - fix pagination for semantic search 
-[] - intuitive Semantic Ranking for semantic search
-[] - literally anything at this point pls 🙏
+[ ] - fix pagination for semantic search 
+[ ] - intuitive Semantic Ranking for semantic search
+[ ] - literally anything at this point pls 🙏
+[x] - bhushan is hot
 
 # future expansion aside from prototype
 - standardized queries via a query processor
 - support for multilingual queries - translation + query processor
 - auto dispatch for query type (syntactic/semantic)
 - relational DB for better group-by ordering and filtering
+
+# wtf?
 
 ## 1. notebooks: data extraction + embedding
 
