@@ -5,10 +5,16 @@ basically: scrape website -> generate descriptions -> embed -> fastapi backend -
 
 ---
 # TODOS for ETL
-[ ] - fix pagination for semantic search 
-[ ] - intuitive Semantic Ranking for semantic search
-[ ] - literally anything at this point pls 🙏
-[x] - bhushan is hot
+- [ ] fix pagination for semantic search 
+- [ ] intuitive Semantic Ranking for semantic search
+- [ ] literally anything at this point pls 🙏
+- [x] bhushan is hot
+
+# demo
+<video controls>
+  <source src="data/demo.mp4" type="video/mp4">
+  your browser does not support the video tag.
+</video>
 
 # future expansion aside from prototype
 - standardized queries via a query processor
