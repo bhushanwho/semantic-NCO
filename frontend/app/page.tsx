@@ -21,8 +21,6 @@ type Occupation = {
   similarity_score?: number
 }
 
-
-
 export default function NCODataSearch() {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -33,7 +31,11 @@ export default function NCODataSearch() {
   const [loading, setLoading] = useState(false)
 
 
-  const filteredData = results
+  const filteredData: Occupation[] = results || []
+
+  const fullDatasetSize = 500;
+  const pageSizes = [10, 50, 100];
+  if (!pageSizes.includes(fullDatasetSize)) pageSizes.push(fullDatasetSize);
 
   const runSearch = async () => {
     setLoading(true)
@@ -43,7 +45,7 @@ export default function NCODataSearch() {
         setResults(data)
       } else {
         const data = await semanticSearch(searchTerm, semanticPageSize)
-        setResults(data.results)
+        setResults(data)
       }
       setShowResults(true)
       setCurrentPage(1)
@@ -54,7 +56,8 @@ export default function NCODataSearch() {
     }
   }
 
-  const getPaginatedData = (data: Occupation[], currentPage: number, pageSize = 20) => {
+  const getPaginatedData = (data: Occupation[], currentPage: number, pageSize = 10) => {
+    if (!data || data.length === 0) return []
     const startIndex = (currentPage - 1) * pageSize
     const endIndex = startIndex + pageSize
     return data.slice(startIndex, endIndex)
@@ -77,15 +80,6 @@ export default function NCODataSearch() {
     setCurrentPage(1)
   }
 
-  const getSliderValue = () => {
-    const sizeMap = [10, 50, 100, 500, filteredData.length]
-    return [sizeMap.indexOf(semanticPageSize)]
-  }
-
-  const getSliderLabel = () => {
-    if (semanticPageSize === filteredData.length) return "All"
-    return semanticPageSize.toString()
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,26 +87,26 @@ export default function NCODataSearch() {
       <header className="border-b border-border bg-card px-6 py-4">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center gap-6">
-            {/* Government Logo Placeholder */}
-            <div className="flex h-12 w-12 items-center justify-center rounded bg-muted">
-              <span className="text-xs font-mono text-muted-foreground">GOV</span>
-            </div>
-
             {/* Title and Subtitle */}
             <div className="flex-1">
               <h1 className="font-mono text-2xl font-bold text-foreground">NCO-2015 Data Search</h1>
-              <p className="text-sm text-muted-foreground">statathon 2025 • team etl • vasavi college of engineering</p>
+              <p className="text-sm text-muted-foreground">statathon 2025 • team ETL • vasavi college of engineering</p>
             </div>
 
             <div className="flex gap-4">
-              <div className="flex h-8 w-12 items-center justify-center rounded bg-muted">
-                <span className="text-xs font-mono text-muted-foreground">ETL</span>
+              <div className="h-15 w-15">
+                <img
+                  src="/etl_logo.png" // place etl_logo.png in the public/ folder
+                  alt="ETL"
+                  className="h-full w-full object-contain"
+                />
               </div>
-              <div className="flex h-8 w-12 items-center justify-center rounded bg-muted">
-                <span className="text-xs font-mono text-muted-foreground">HACK</span>
-              </div>
-              <div className="flex h-8 w-12 items-center justify-center rounded bg-muted">
-                <span className="text-xs font-mono text-muted-foreground">VCE</span>
+              <div className="h-16 w-16">
+                <img
+                  src="/st25_logo.png"
+                  alt="STATATHON"
+                  className="h-full w-full object-contain"
+                />
               </div>
             </div>
           </div>
@@ -182,23 +176,23 @@ export default function NCODataSearch() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-muted-foreground">Show:</span>
                       <div className="relative bg-white border rounded-full p-0.5 flex items-center justify-between shadow-sm">
-                        {[10, 50, 100, 500, filteredData.length].map((size, index) => (
+                        {pageSizes.map((size) => (
                           <button
-                            key={size}
+                            key={size} // unique key
                             onClick={() => handleSemanticPageSizeChange(size)}
                             className={`relative z-10 px-2 py-1 text-xs font-mono font-medium rounded-full transition-colors ${
                               semanticPageSize === size ? "text-white" : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
-                            {size === filteredData.length ? "All" : size}
+                            {size === fullDatasetSize ? "All" : size}
                           </button>
                         ))}
                         {/* Sliding indicator */}
                         <div
                           className="absolute top-0.5 bottom-0.5 bg-primary rounded-full transition-all duration-200 ease-out"
                           style={{
-                            left: `${[10, 50, 100, 500, filteredData.length].indexOf(semanticPageSize) * 20 + 1}%`,
-                            width: "18%",
+                            left: `${pageSizes.indexOf(semanticPageSize) * (100 / pageSizes.length)}%`,
+                            width: `${100 / pageSizes.length}%`,
                           }}
                         />
                       </div>
@@ -233,23 +227,29 @@ export default function NCODataSearch() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedData.map((occupation, index) => (
-                      <TableRow key={occupation.nco_2015}>
-                        <TableCell className="font-mono">{(currentPage - 1) * pageSize + index + 1}</TableCell>
-                        <TableCell className="font-medium">{occupation.occupation_title}</TableCell>
-                        <TableCell className="font-mono">{occupation.nco_2015}</TableCell>
-                        <TableCell className="font-mono">{occupation.nco_2004}</TableCell>
-                        <TableCell>{occupation.division}</TableCell>
-                        <TableCell>{occupation.subdivision}</TableCell>
-                        <TableCell>{occupation.group}</TableCell>
-                        <TableCell>{occupation.family}</TableCell>
-                        {searchType === "semantic" && (
-                          <TableCell className="font-mono">
-                            {(occupation.similarity_score as number).toFixed(2)}
-                          </TableCell>
-                        )}
+                    {paginatedData.length > 0 ? (
+                      paginatedData.map((occupation, index) => (
+                        <TableRow key={occupation.nco_2015}>
+                          <TableCell className="font-mono">{(currentPage - 1) * pageSize + index + 1}</TableCell>
+                          <TableCell className="font-medium">{occupation.occupation_title}</TableCell>
+                          <TableCell className="font-mono">{occupation.nco_2015}</TableCell>
+                          <TableCell className="font-mono">{occupation.nco_2004}</TableCell>
+                          <TableCell>{occupation.division}</TableCell>
+                          <TableCell>{occupation.subdivision}</TableCell>
+                          <TableCell>{occupation.group}</TableCell>
+                          <TableCell>{occupation.family}</TableCell>
+                          {searchType === "semantic" && (
+                            <TableCell className="font-mono">{occupation.similarity_score?.toFixed(2) ?? "-"}</TableCell>
+                          )}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={searchType === "semantic" ? 9 : 8} className="text-center text-muted-foreground">
+                          No results found
+                        </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>
