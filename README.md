@@ -11,10 +11,7 @@ basically: scrape website -> generate descriptions -> embed -> fastapi backend -
 - [x] bhushan is hot
 
 # demo
-<video controls>
-  <source src="data/demo.mp4" type="video/mp4">
-  your browser does not support the video tag.
-</video>
+
 
 # future expansion aside from prototype
 - standardized queries via a query processor
@@ -94,8 +91,8 @@ NEXT_PUBLIC_API_BASE=http://localhost:8000
 
 ## 4. workflow
 
-1. (OPTIONAL: data/ contains everything - 500 for prototype) run notebooks to scrape + clean csv  
-2. (OPTIONAL: data/ contains everything - 500 for prototype) generate descriptions with ollama + gemma3:1b  
-3. (OPTIONAL: data/ contains everything - 500 for prototype) embed descriptions -> embed_data column  
+1. (OPTIONAL: `data/` contains everything - 500 for prototype) run notebooks to scrape + clean csv  
+2. (OPTIONAL: `data/` contains everything - 500 for prototype) generate descriptions with ollama + gemma3:1b  
+3. (OPTIONAL: `data/` contains everything - 500 for prototype) embed descriptions -> embed_data column  
 4. start fastapi backend  
 5. start next frontend
