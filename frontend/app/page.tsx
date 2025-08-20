@@ -7,142 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { exactSearch, semanticSearch, fetchAllData } from "@/lib/api"
 
-// Mock data for occupation classifications
-const mockOccupations = [
-  {
-    id: 1,
-    title: "Infantry Team Leader",
-    nco2015: "11-1011.00",
-    nco2004: "55-1011.00",
-    division: "Military Specific Occupations",
-    subdivision: "Combat Arms",
-    group: "Infantry and Gun Crews",
-    family: "Infantry",
-    similarity: 0.95,
-  },
-  {
-    id: 2,
-    title: "Information Technology Specialist",
-    nco2015: "15-1142.00",
-    nco2004: "15-1051.00",
-    division: "Computer and Mathematical Occupations",
-    subdivision: "Computer Specialists",
-    group: "Computer Support Specialists",
-    family: "Information Technology",
-    similarity: 0.92,
-  },
-  {
-    id: 3,
-    title: "Combat Medic",
-    nco2015: "31-9099.01",
-    nco2004: "31-9099.00",
-    division: "Healthcare Support Occupations",
-    subdivision: "Other Healthcare Support Occupations",
-    group: "Medical Assistants and Other Healthcare Support",
-    family: "Healthcare",
-    similarity: 0.89,
-  },
-  {
-    id: 4,
-    title: "Intelligence Analyst",
-    nco2015: "19-3033.00",
-    nco2004: "19-3022.00",
-    division: "Life, Physical, and Social Science Occupations",
-    subdivision: "Social Scientists and Related Workers",
-    group: "Miscellaneous Social Scientists and Related Workers",
-    family: "Intelligence",
-    similarity: 0.87,
-  },
-  {
-    id: 5,
-    title: "Military Police Officer",
-    nco2015: "33-3051.00",
-    nco2004: "33-3051.00",
-    division: "Protective Service Occupations",
-    subdivision: "Law Enforcement Workers",
-    group: "Police and Detectives",
-    family: "Law Enforcement",
-    similarity: 0.85,
-  },
-  {
-    id: 6,
-    title: "Aviation Mechanic",
-    nco2015: "49-3011.00",
-    nco2004: "49-3011.00",
-    division: "Installation, Maintenance, and Repair Occupations",
-    subdivision: "Vehicle and Mobile Equipment Mechanics",
-    group: "Aircraft and Avionics Equipment Mechanics",
-    family: "Aviation",
-    similarity: 0.83,
-  },
-  {
-    id: 7,
-    title: "Communications Specialist",
-    nco2015: "27-4014.00",
-    nco2004: "27-4014.00",
-    division: "Media and Communication Occupations",
-    subdivision: "Media and Communication Equipment Workers",
-    group: "Broadcast and Sound Engineering Technicians",
-    family: "Communications",
-    similarity: 0.81,
-  },
-  {
-    id: 8,
-    title: "Supply Chain Manager",
-    nco2015: "11-3071.00",
-    nco2004: "11-3071.00",
-    division: "Management Occupations",
-    subdivision: "Operations Specialties Managers",
-    group: "Transportation, Storage, and Distribution Managers",
-    family: "Logistics",
-    similarity: 0.79,
-  },
-  {
-    id: 9,
-    title: "Cyber Security Analyst",
-    nco2015: "15-1212.00",
-    nco2004: "15-1199.00",
-    division: "Computer and Mathematical Occupations",
-    subdivision: "Computer Specialists",
-    group: "Information Security Analysts",
-    family: "Cybersecurity",
-    similarity: 0.77,
-  },
-  {
-    id: 10,
-    title: "Field Artillery Officer",
-    nco2015: "55-1017.00",
-    nco2004: "55-1017.00",
-    division: "Military Specific Occupations",
-    subdivision: "Combat Arms",
-    group: "Artillery and Missile Crews",
-    family: "Artillery",
-    similarity: 0.75,
-  },
-  {
-    id: 11,
-    title: "Human Resources Specialist",
-    nco2015: "13-1071.00",
-    nco2004: "13-1071.00",
-    division: "Business and Financial Operations Occupations",
-    subdivision: "Human Resources Workers",
-    group: "Human Resources Specialists",
-    family: "Human Resources",
-    similarity: 0.73,
-  },
-  {
-    id: 12,
-    title: "Logistics Coordinator",
-    nco2015: "43-5061.00",
-    nco2004: "43-5061.00",
-    division: "Office and Administrative Support Occupations",
-    subdivision: "Material Recording, Scheduling, Dispatching",
-    group: "Production, Planning, and Expediting Clerks",
-    family: "Logistics",
-    similarity: 0.71,
-  },
-]
+
+type Occupation = {
+  occupation_title: string
+  nco_2015: string
+  nco_2004: string
+  division: string
+  subdivision: string
+  group: string
+  family: string
+  similarity_score?: number
+}
+
+
 
 export default function NCODataSearch() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -150,32 +29,45 @@ export default function NCODataSearch() {
   const [showResults, setShowResults] = useState(false)
   const [searchType, setSearchType] = useState("exact")
   const [semanticPageSize, setSemanticPageSize] = useState(10)
+  const [results, setResults] = useState<Occupation[]>([])
+  const [loading, setLoading] = useState(false)
 
-  const filterOccupations = (searchTerm: string) => {
-    if (!searchTerm) return mockOccupations
-    return mockOccupations.filter(
-      (occupation) =>
-        occupation.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        occupation.division.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        occupation.family.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+
+  const filteredData = results
+
+  const runSearch = async () => {
+    setLoading(true)
+    try {
+      if (searchType === "exact") {
+        const data = await exactSearch(searchTerm)
+        setResults(data)
+      } else {
+        const data = await semanticSearch(searchTerm, semanticPageSize)
+        setResults(data.results)
+      }
+      setShowResults(true)
+      setCurrentPage(1)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const filteredData = filterOccupations(searchTerm)
-
-  const getPaginatedData = (data: typeof mockOccupations, currentPage: number, pageSize = 10) => {
+  const getPaginatedData = (data: Occupation[], currentPage: number, pageSize = 20) => {
     const startIndex = (currentPage - 1) * pageSize
     const endIndex = startIndex + pageSize
     return data.slice(startIndex, endIndex)
   }
 
-  const getTotalPages = (dataLength: number, pageSize = 10) => Math.ceil(dataLength / pageSize)
+  const getTotalPages = (dataLength: number, pageSize = 20) => Math.ceil(dataLength / pageSize)
 
-  const pageSize = searchType === "semantic" ? semanticPageSize : 10
+  const pageSize = searchType === "semantic" ? semanticPageSize : 20
   const paginatedData = getPaginatedData(filteredData, currentPage, pageSize)
   const totalPages = getTotalPages(filteredData.length, pageSize)
 
   const handleSearch = () => {
+    runSearch()
     setShowResults(true)
     setCurrentPage(1)
   }
@@ -333,26 +225,28 @@ export default function NCODataSearch() {
                       <TableHead className="font-mono">Occupation Title</TableHead>
                       <TableHead className="font-mono">NCO 2015</TableHead>
                       <TableHead className="font-mono">NCO 2004</TableHead>
-                      <TableHead>{/* Division */}</TableHead>
-                      <TableHead>{/* Subdivision */}</TableHead>
-                      <TableHead>{/* Group */}</TableHead>
-                      <TableHead>{/* Family */}</TableHead>
+                      <TableHead className="font-mono">Division</TableHead>
+                      <TableHead className="font-mono">Subdivision</TableHead>
+                      <TableHead className="font-mono">Group</TableHead>
+                      <TableHead className="font-mono">Family</TableHead>
                       {searchType === "semantic" && <TableHead className="font-mono">Similarity Ranking</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedData.map((occupation, index) => (
-                      <TableRow key={occupation.id}>
+                      <TableRow key={occupation.nco_2015}>
                         <TableCell className="font-mono">{(currentPage - 1) * pageSize + index + 1}</TableCell>
-                        <TableCell className="font-medium">{occupation.title}</TableCell>
-                        <TableCell className="font-mono">{occupation.nco2015}</TableCell>
-                        <TableCell className="font-mono">{occupation.nco2004}</TableCell>
+                        <TableCell className="font-medium">{occupation.occupation_title}</TableCell>
+                        <TableCell className="font-mono">{occupation.nco_2015}</TableCell>
+                        <TableCell className="font-mono">{occupation.nco_2004}</TableCell>
                         <TableCell>{occupation.division}</TableCell>
                         <TableCell>{occupation.subdivision}</TableCell>
                         <TableCell>{occupation.group}</TableCell>
                         <TableCell>{occupation.family}</TableCell>
                         {searchType === "semantic" && (
-                          <TableCell className="font-mono">{occupation.similarity.toFixed(2)}</TableCell>
+                          <TableCell className="font-mono">
+                            {(occupation.similarity_score as number).toFixed(2)}
+                          </TableCell>
                         )}
                       </TableRow>
                     ))}

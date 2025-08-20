@@ -17,8 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "NCO-2015 Data Search",
-  description: "Military occupation classification database search interface",
-  generator: "v0.app",
+  description: "NCO 2015 Semantic Search - Statathon 2025 PS5",
 }
 
 export default function RootLayout({
