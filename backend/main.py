@@ -23,7 +23,7 @@ class Occupation(BaseModel):
     similarity_score: float | None = None
 
 
-df = pd.read_csv("../nco_500_embed.csv", dtype=str)
+df = pd.read_csv("../data/nco_500_embed.csv", dtype=str)
 df = df.fillna("")
 
 texts = texts = df["embed_data"].tolist()
