@@ -4,10 +4,19 @@ this project lets you do semantic search over the nco-2015 table.
 basically: scrape website -> generate descriptions -> embed -> fastapi backend -> next frontend.
 
 ---
+# TODOS for ETL
+[] - fix pagination for semantic search 
+[] - intuitive Semantic Ranking for semantic search
+[] - literally anything at this point pls 🙏
+
+# future expansion aside from prototype
+- standardized queries via a query processor
+- support for multilingual queries - translation + query processor
+- auto dispatch for query type (syntactic/semantic)
+- relational DB for better group-by ordering and filtering
 
 ## 1. notebooks: data extraction + embedding
 
-### structure
 notebooks/ has jupyter notebooks that do most of the preprocessing
 
 ### data extraction
@@ -20,10 +29,10 @@ notebooks/ has jupyter notebooks that do most of the preprocessing
 - used ollama + small lm gemma3:1b to generate descriptions
 - each row now has a description
 
-### embedding + vectorstore
+### embeddings + vectorstore
 - chunked descriptions
 - stored in vectorstore
-- created embed_data column in csv with vector info
+- created embed_data column in csv with vector info (only 500 for this prototype)
 
 ---
 
@@ -45,9 +54,9 @@ uv run uvicorn main:app --reload
 ```
 
 ### api
-- /data - fetch all rows
-- /exact_search?query= - guess lol
-- /semantic_search?query= ?k= - 🤓
+- `/data` - fetch all rows
+- `/exact_search?query=` - guess lol
+- `/semantic_search?query= ?k=` - 🤓
 
 ### env
 create .env in project root with:
@@ -76,8 +85,8 @@ NEXT_PUBLIC_API_BASE=http://localhost:8000
 
 ## 4. workflow
 
-1. (OPTIONAL: data/ contains everything) run notebooks to scrape + clean csv  
-2. (OPTIONAL: data/ contains everything) generate descriptions with ollama + gemma3:1b  
-3. (OPTIONAL: data/ contains everything) embed descriptions -> embed_data column  
+1. (OPTIONAL: data/ contains everything - 500 for prototype) run notebooks to scrape + clean csv  
+2. (OPTIONAL: data/ contains everything - 500 for prototype) generate descriptions with ollama + gemma3:1b  
+3. (OPTIONAL: data/ contains everything - 500 for prototype) embed descriptions -> embed_data column  
 4. start fastapi backend  
-5. start react frontend and search
+5. start next frontend
