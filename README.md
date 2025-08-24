@@ -7,8 +7,6 @@ basically: scrape website -> generate descriptions -> embed -> fastapi backend -
 # TODOS for ETL
 - [ ] fix pagination for semantic search 
 - [ ] intuitive Semantic Ranking for semantic search
-- [ ] literally anything at this point pls 🙏
-- [x] bhushan is hot
 
 # demo
 
@@ -23,7 +21,7 @@ https://github.com/user-attachments/assets/66a79c0c-c4d4-4e06-8480-501f27efb87e
 - auto dispatch for query type (syntactic/semantic)
 - relational DB for better group-by ordering and filtering
 
-# wtf?
+# what?
 
 ## 1. notebooks: data extraction + embedding
 
@@ -49,7 +47,7 @@ notebooks/ has jupyter notebooks that do most of the preprocessing
 ## 2. backend: fastapi + langchain
 
 ### setup
-- python (hell if i cared about the version. 3.12.10 i believe)
+- python (3.12.10)
 
 ```
 uv venv
